@@ -4,3 +4,4 @@ It will:
 -Disable the Windows Firewall (the EC2 security groups is they way to handle network security for EC2)
 -Download NiceDCV server software
 -Initialize and format the NVMe disk attached to G* instances as D:, and call it CACHE
+-Install the AWS CLI version 2
