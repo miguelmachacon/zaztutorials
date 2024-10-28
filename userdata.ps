@@ -1,0 +1,21 @@
+<powershell>
+$Bucket = "ec2-windows-nvidia-drivers"
+$KeyPrefix = "latest"
+$LocalPath = "$home\Desktop\NVIDIA"
+$Objects = Get-S3Object -BucketName $Bucket -KeyPrefix $KeyPrefix -Region us-east-1
+foreach ($Object in $Objects) {
+    $LocalFileName = $Object.Key
+    if ($LocalFileName -ne '' -and $Object.Size -ne 0) {
+        $LocalFilePath = Join-Path $LocalPath $LocalFileName
+        Copy-S3Object -BucketName $Bucket -Key $Object.Key -LocalFile $LocalFilePath -Region us-east-1
+    }
+}
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+$Path = "$home\Desktop\DCV"; New-Item -ItemType Directory -Path $Path; $Installer = "nice-dcv-server-x64-Release.msi"; $LocalFilePath = Join-Path $Path $Installer; Invoke-WebRequest "https://d1uj6qtbmh3dt5.cloudfront.net/nice-dcv-server-x64-Release.msi" -OutFile $LocalFilePath
+$confirmpreference = 'none'
+Initialize-Disk -Number 1
+Get-Disk 1 | Clear-Disk -RemoveData
+Initialize-Disk -Number 1
+New-Partition  -DiskNumber 1 -UseMaximumSize -DriveLetter D | Format-Volume -FileSystem NTFS -NewFileSystemLabel CACHE
+msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2.msi /qn
+</powershell>
